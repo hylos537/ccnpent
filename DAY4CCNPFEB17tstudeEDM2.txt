@@ -125,25 +125,40 @@ router eigrp 100
 OSPF NETWORK:
 R4:
 config t
+interface loopback 0
+ip add 4.4.4.4 255.255.255.255
 router ospf 1
+network 4.4.4.4 0.0.0.0 area 0
 network 10.1.1.8 0.0.0.3 area 34
 
 R3:
 config t
+interface loopback 0
+ip add 3.3.3.3 255.255.255.255
 router ospf 1
+network 3.3.3.3 0.0.0.0 area 0
 network 10.1.1.4 0.0.0.3 area 0
 network 10.1.1.8 0.0.0.3 area 34
 
 R2:
 config t
+interface loopback 0
+ip add 2.2.2.2 255.255.255.255
 router ospf 1
+network 2.2.2.2 0.0.0.0 area 0
 network 10.1.1.4 0.0.0.3 area 0
 network 10.1.1.0 0.0.0.3 area 12
 
 R1:
 config t
+interface loopback 0
+ip add 1.1.1.1 255.255.255.255
 router ospf 1
+network 1.1.1.1 0.0.0.0 area 12
 network 10.1.1.0 0.0.0.3 area 12
+!WHO GET PASTED FIRST, BECOMES THE DR AND BDR
+
+
 
 @@@
 TASK9.3: BASIC eBGP FOR ISPS and R1.
