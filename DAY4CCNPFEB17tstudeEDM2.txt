@@ -387,6 +387,7 @@ IPV6 ADDRESSING FOR THE ISP'S
 		ipv6 unicast-routing
 		int lo3
 			ipv6 add b33::1/128
+		ipv6 add 8:8:8:8::8888/128
 		router bgp 300
 			neigh b:3:4:b::5 remote-as 450
 			neigh b:1:2:b::2 remote-as 200
@@ -406,6 +407,7 @@ IPV6 ADDRESSING FOR THE ISP'S
 	ipv6 unicast-routing
 	int lo2
 		ipv6 add b22::1/128
+		ipv6 add 8:8:8:8::8888/128
 		router bgp 200
 			neigh b:1:2:b::3 remote-as 300
 			neigh b:2:4:b::5 remote-as 450
@@ -441,6 +443,7 @@ ___________________________?
 	ipv6 unicast-routing
 	int lo1
 		ipv6 add b44::1/128
+		ipv6 add 8:8:8:8::8888/128
 		router bgp 450
 			neigh b:1:4:b::5 remote-as 450
 			neigh b:2:1:b::2 remote-as 200
@@ -557,7 +560,7 @@ B   B22::1/128 [20/0]
 @R1
 	conf t
 		ipv6 unicast-routing
-		interface Loopback1
+		interface Loopback0
 			description Test I/F for BGP, OSPFv2 & OSPFv3 Routing
 			ip address 1.1.1.1 255.255.255.255
 			ipv6 address FEC0:1::1/122
@@ -568,7 +571,7 @@ B   B22::1/128 [20/0]
 @R2
 	conf t
 		ipv6 unicast-routing
-		interface Loopback2
+		interface Loopback0
 			description Test I/F for OSPFv2 & OSPFv3 Routing
 			ip address 2.2.2.2 255.255.255.255
 			ipv6 address FEC0:2::2/122
@@ -581,14 +584,14 @@ B   B22::1/128 [20/0]
 @R3
 	conf t
 		ipv6 unicast-routing
-		interface Loopback3
+		interface Loopback0
 			description Test I/F for OSPFv2 & OSPFv3 Routing
 			ip address 3.3.3.3 255.255.255.255
 			ipv6 address FEC0:3::3/122
 		interface Tunnel34
 			no ip address
 			ipv6 address 2026::34:1/122
-			tunnel source lo3
+			tunnel source 3.3.3.3
 			tunnel destination 4.4.4.4
 			tunnel mode ipv6ip
 		int e1/1
@@ -598,7 +601,7 @@ B   B22::1/128 [20/0]
 @R4
 	conf t
 		ipv6 unicast-routing
-		interface Loopback4
+		interface Loopback0
 			description Test I/F for OSPFv2 & OSPFv3 Routing
 			ip address 4.4.4.4 255.255.255.255
 			ipv6 address FEC0::4:4/122
@@ -619,12 +622,12 @@ B   B22::1/128 [20/0]
 		interface Tunnel34
 	    !creating a tunnel for the ipv6 connection of router 3 and router 4
 			no ip address
-			ipv6 address _____::__:__/122
-			tunnel source ____
-			tunnel destination ________
+			ipv6 address 2026::34:2/122
+			tunnel source 4.4.4.4
+			tunnel destination 3.3.3.3
 			tunnel mode ipv6ip
 			end
-			
+			 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			end
 ##################################
@@ -634,6 +637,15 @@ B   B22::1/128 [20/0]
 		
 @R1
 	conf t
+
+		ipv6 router ospf 6
+			router-id 1.1.1.1
+		int lo0
+			ipv6 ospf 6 area 12
+		int e1/0
+			ipv6 ospf 6 area 12 
+			end
+
 ___________________________?
 ___________________________?
 ___________________________?
@@ -646,8 +658,8 @@ ___________________________?
 	conf t
 		ipv6 router ospf 6
 			router-id 2.2.2.2
-		int lo2
-			ipv6 ospf 6 area 0
+		int lo0
+			ipv6 ospf 6 area 12
 		int e1/1
 			ipv6 ospf 6 area 0
 		int e1/2
@@ -657,7 +669,7 @@ ___________________________?
 	conf t
 		ipv6 router ospf 6
 			router-id 3.3.3.3
-		int lo3
+		int lo0
 			ipv6 ospf 6 area 0
 		interface Tunnel34
 			ipv6 ospf 6 area 34
@@ -667,6 +679,14 @@ ___________________________?
 
 @R4
 	conf t
+		ipv6 router ospf 6
+			router-id 4.4.4.4
+		int lo0
+			ipv6 ospf 6 area 34
+		interface Tunnel34
+			ipv6 ospf 6 area 34 
+			end
+		
 ___________________________?
 ___________________________?
 ___________________________?
@@ -710,12 +730,12 @@ R1:
 config t
 ipv6 router ospf 6
   default-information originate always
-  redistribute bgp 1 metric 69
+  redistribute bgp 100 metric 69
   
 OSPFv3 to BGP:
 R1:
 config t
-router bgp 1
+router bgp 100
   address-family ipv6 unicast
    redistribute ospf 6 match internal external 1 external 2
   
@@ -732,12 +752,12 @@ router bgp 1
 
 @D1
 	conf t
-		ipv6 unicast-routing
-		interface Loopback1
-			description IPv4, IPv6 & RIPng Test I/F
-			ip address 11.11.11.11 255.255.255.255
-			ipv6 add 11:11:11:11::1/128
-			ipv6 address FEC0::11:1/122
+	ipv6 unicast-routing
+	interface Loopback1
+	description IPv4, IPv6 & RIPng Test I/F
+	ip address 11.11.11.11 255.255.255.255
+	ipv6 add 11:11:11:11::1/128
+	ipv6 address FEC0::11:1/122
 		interface e1/1
 			description L3 UpLink to R4
 			no switchport
@@ -796,12 +816,12 @@ router bgp 1
 			
 @D1
 	conf t
-		int lo1
+		int lo0
 			ipv6 add 11:11:11:11::1/64
 		ipv6 router eigrp 10
 			eigrp router-id 1.1.1.1
 			no shut
-		int lo1
+		int lo0
 			ipv6 eigrp 10
 		int e1/1
 			ipv6 eigrp 10
@@ -818,6 +838,21 @@ router bgp 1
 		int lo1
 			ipv6 add 22:22:22:22::2/64
 		ipv6 router eigrp 10
+			eigrp router-id 2.2.2.2
+			no shut
+		int lo0
+			ipv6 eigrp 10
+		int e1/1
+			ipv6 eigrp 10
+		int vlan 10
+			ipv6 eigrp 10
+		int vlan 20
+			ipv6 eigrp 10
+		int vlan 200
+			ipv6 eigrp 10
+			end
+
+
 ___________________________?
 ___________________________?
 ___________________________?
@@ -848,10 +883,16 @@ ___________________________?
 @A2
 	cn
 	show run int e0/0
-	
+
+
+DEFAULT IPV6 ROUTING FOR P1 and P2
+P1/P2:
+conf t
+ipv6 route ::/0 10:2:1:12::1
+
+
 @P1
 	conf t
-		
 		ipv6 unicast-routing
 		int e0/0
 		shutdown
