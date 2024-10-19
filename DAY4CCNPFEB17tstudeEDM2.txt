@@ -344,6 +344,20 @@ IPV6 ADDRESSING FOR THE ISP'S
 		int e1/1
 			ipv6 add b:1:11:b::1/64
 			end
+
+
+@R2
+	config t
+		ipv6 unicast-routing]
+		int e1/2
+			ipv6 add 2026::12:2/122 
+		int e1/1
+			ipv6 add ipv6 add 2026::1:1/122 
+			end
+
+
+
+
                 ###################
 				~~~~~~~~~~~~~~~~~~~~~~~~~IPV6 BGP Configuration~~~~~~~~~~~~~~~~~~~~~~~
 @ISP4
